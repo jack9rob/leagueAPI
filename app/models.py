@@ -23,6 +23,7 @@ class Player(Base):
     lastname = Column(String, nullable=False)
     email = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
+    is_Admin = Column(Boolean, nullable=False, default=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('NOW()'))
 
     address = relationship("Address", back_populates="resident")
@@ -31,6 +32,7 @@ class Team(Base):
     __tablename__ = "teams"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False, unique=True)
+    owner_id = Column(Integer, ForeignKey('players.id'), nullable=True)
 
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('NOW()'))
 
@@ -88,5 +90,5 @@ class Goal(Base):
     player_game_id = Column(Integer, ForeignKey('player_games.id', ondelete="CASCADE"), nullable=False)
     player_game_assist_1 = Column(Integer, ForeignKey('player_games.id', ondelete="CASCADE"), nullable=False)
     player_game_assist_2 = Column(Integer, ForeignKey('player_games.id', ondelete="CASCADE"), nullable=False)
-    goal_type = Column(Enum())
+    #goal_type = Column(Enum())
     time = Column(Float, nullable=False)
