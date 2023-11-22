@@ -6,4 +6,6 @@ def hash_password(password: str):
     return pwd_context.hash(password)
 
 def verify(plain_password: str, hashed_password: str):
-    return pwd_context.verify(plain_password, hashed_password)
+    print('plain: ', plain_password)
+    print('hashed: ', hashed_password)
+    return pwd_context.verify(plain_password, hashed_password) # gives error idk why
