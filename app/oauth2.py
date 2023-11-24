@@ -26,7 +26,7 @@ def verify_access_token(token: str, credentials_exception):
     try:
         decoded_token = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
 
-        id: str = decoded_token.get("user_id")
+        id: str = decoded_token.get("player_id")
 
         if id is None:
             raise credentials_exception

@@ -5,6 +5,7 @@ from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text
 import enum
 
+
 class Address(Base):
     __tablename__ = "addresses"
     id = Column(Integer, primary_key=True, index=True)
@@ -14,7 +15,7 @@ class Address(Base):
     postal_code = Column(String, nullable=False)
     player_id = Column(Integer, ForeignKey("players.id", ondelete="CASCADE"), nullable=False)
 
-    resident = relationship("Player", back_populates="address")
+    resident = relationship("Player")
 
 class Player(Base):
     __tablename__ = "players"
@@ -23,19 +24,20 @@ class Player(Base):
     lastname = Column(String, nullable=False)
     email = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
-    #is_Admin = Column(Boolean, nullable=False, default=False)
+    is_admin = Column(Boolean, nullable=False, default=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('NOW()'))
 
-    address = relationship("Address", back_populates="resident")
+    team = relationship("Team", back_populates='player')
 
-'''
+
 class Team(Base):
     __tablename__ = "teams"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False, unique=True)
-    owner_id = Column(Integer, ForeignKey('players.id'), nullable=True)
-
+    player_id = Column(Integer, ForeignKey('players.id'), nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('NOW()'))
+
+    player = relationship("Player", back_populates="team")
 
 class Season(Base):
     __tablename__ = "seasons"
@@ -44,7 +46,7 @@ class Season(Base):
     start_date = Column(Date, nullable=False, server_default=text('NOW()'))
     end_date = Column(Date, nullable=False, server_default=text('NOW()'))
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('NOW()'))
-
+'''
 class TeamSeason(Base):
     __tablename__ = "team_seasons"
     id = Column(Integer, primary_key=True, index=True)
@@ -62,6 +64,7 @@ class Game(Base):
     team_home_goals = Column(Integer, nullable=False, default=0)
     team_away_goals = Column(Integer, nullable=False, default=0)
     date = Column(Date, nullable=False, server_default=text('NOW()'))
+    #season_id = Column(Integer, Foreignkey(season.id), ondelete='CASCADE')
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('NOW()'))
 
     home_team = relationship("TeamSeason", back_populates="home_games")
@@ -83,6 +86,7 @@ class PlayerGame(Base):
     id = Column(Integer, primary_key=True, index=True)
     player_id = Column(Integer, ForeignKey("players.id", ondelete="CASCADE"), nullable=False)
     game_id = Column(Integer, ForeignKey('games.id', ondelete="CASCADE"), nullable=False)
+    #team_season_id = Column(Integer, Forignkey('team_seasons.id', ondelete='CASCADE'))
     position = Column(Enum(PositionEnum))
 
 class Goal(Base):
