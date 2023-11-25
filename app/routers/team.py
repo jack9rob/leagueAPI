@@ -1,14 +1,13 @@
 import json
 from fastapi import APIRouter, Depends, status, HTTPException
-from ..schemas import player
 from sqlalchemy.orm import Session
 from app.database import get_db
 from .. import utils, models
-from ..schemas import team
+from ..schemas import team_season, team
 
 router = APIRouter(
     prefix='/teams',
-    tags=['Player']
+    tags=['Team']
 )
 
 @router.post('/', status_code=status.HTTP_201_CREATED)
@@ -25,7 +24,25 @@ def get_teams(db: Session = Depends(get_db)):
     teams = db.query(models.Team, models.Player).join(models.Player, models.Player.id == models.Team.player_id).all()
     return {"data": teams}
 
-@router.get('/first', response_model=team.TeamResponse)
-def get_teams_first(db: Session = Depends(get_db)):
-    teams = db.query(models.Team).first()
+@router.post('/seasons')
+def create_team_season(team_season: team_season.TeamSeasonCreate, db: Session = Depends((get_db))):
+    db_team_season = models.TeamSeason(**team_season.model_dump())
+    db.add(db_team_season)
+    db.commit()
+    db.refresh(db_team_season)
+    return db_team_season
+
+@router.get('/seasons', response_model=team_season.TeamSeasonList)
+def get_team_seasons(db: Session = Depends(get_db)):
+    team_seasons = db.query(models.TeamSeason, models.Team, models.Season).join(models.Season, models.Season.id == models.TeamSeason.season_id).join(models.Team, models.Team.id == models.TeamSeason.team_id).all()
+
+    return {"data": team_seasons}
+
+@router.get("/seasons/{id}")
+def get_teams_seasons(id: int, db: Session = Depends(get_db)):
+    team_seasons = db.query(models.TeamSeason, models.Team, models.Season).join(models.Season, models.Season.id == models.TeamSeason.season_id).join(models.Team, models.Team.id == models.TeamSeason.team_id).filter(models.Team.id == id).all()
+
+    if not team_seasons:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"team with id: {id} was not found")
     
+    return team_seasons

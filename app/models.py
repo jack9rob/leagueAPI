@@ -38,6 +38,7 @@ class Team(Base):
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('NOW()'))
 
     player = relationship("Player", back_populates="team")
+    seasons = relationship('TeamSeason', back_populates='team')
 
 class Season(Base):
     __tablename__ = "seasons"
@@ -46,12 +47,17 @@ class Season(Base):
     start_date = Column(Date, nullable=False, server_default=text('NOW()'))
     end_date = Column(Date, nullable=False, server_default=text('NOW()'))
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('NOW()'))
-'''
+
+    team = relationship("TeamSeason", back_populates="season")
+
 class TeamSeason(Base):
     __tablename__ = "team_seasons"
     id = Column(Integer, primary_key=True, index=True)
     team_id = Column(Integer, ForeignKey("teams.id", ondelete="CASCADE"))
     season_id = Column(Integer, ForeignKey("seasons.id", ondelete="CASCADE"))
+
+    team = relationship('Team', back_populates='seasons')
+    season = relationship('Season', back_populates='team')
 
     home_games = relationship("Game", back_populates="home_team")
     away_games = relationship("Game", back_populates="away_team")
@@ -63,13 +69,12 @@ class Game(Base):
     team_away_id = Column(Integer, ForeignKey("team_seasons.id", ondelete="CASCADE"), nullable=False)
     team_home_goals = Column(Integer, nullable=False, default=0)
     team_away_goals = Column(Integer, nullable=False, default=0)
-    date = Column(Date, nullable=False, server_default=text('NOW()'))
-    #season_id = Column(Integer, Foreignkey(season.id), ondelete='CASCADE')
+    date = Column(TIMESTAMP, nullable=False, server_default=text('NOW()'))
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('NOW()'))
 
     home_team = relationship("TeamSeason", back_populates="home_games")
     away_team = relationship("TeamSeason", back_populates="away_games")
-
+'''
 class PositionEnum(enum.Enum):
     player = "player"
     goalie = "goalie"
