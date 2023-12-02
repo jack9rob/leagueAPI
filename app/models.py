@@ -59,9 +59,6 @@ class TeamSeason(Base):
     team = relationship('Team', back_populates='seasons')
     season = relationship('Season', back_populates='team')
 
-    home_games = relationship("Game", back_populates="home_team")
-    away_games = relationship("Game", back_populates="away_team")
-
 class Game(Base):
     __tablename__ = "games"
     id = Column(Integer, primary_key=True, index=True)
@@ -72,8 +69,8 @@ class Game(Base):
     date = Column(TIMESTAMP, nullable=False, server_default=text('NOW()'))
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('NOW()'))
 
-    home_team = relationship("TeamSeason", back_populates="home_games")
-    away_team = relationship("TeamSeason", back_populates="away_games")
+    home_team = relationship("TeamSeason", foreign_keys=[team_home_id])
+    away_team = relationship("TeamSeason", foreign_keys=[team_away_id])
 '''
 class PositionEnum(enum.Enum):
     player = "player"
