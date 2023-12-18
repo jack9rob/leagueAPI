@@ -79,14 +79,14 @@ class PlayerTeamSeason(Base):
     player_id = Column(Integer, ForeignKey("players.id", ondelete="CASCADE"), nullable=False)
     team_season_id = Column(Integer, ForeignKey("team_seasons.id", ondelete="CASCADE"), nullable=False)
     is_player = Column(Boolean, nullable=False, server_default='True')
-'''
+
 class PlayerGame(Base):
     __tablename__ = "player_games"
     id = Column(Integer, primary_key=True, index=True)
     player_id = Column(Integer, ForeignKey("players.id", ondelete="CASCADE"), nullable=False)
     game_id = Column(Integer, ForeignKey('games.id', ondelete="CASCADE"), nullable=False)
-    #team_season_id = Column(Integer, Forignkey('team_seasons.id', ondelete='CASCADE'))
-    position = Column(Enum(PositionEnum))
+    team_id = Column(Integer, ForeignKey('teams.id', ondelete='CASCADE'))
+    is_player = Column(Boolean, nullable=False, server_default='True')
 
 class Goal(Base):
     __tablename__ = "goals"
@@ -96,4 +96,3 @@ class Goal(Base):
     player_game_assist_2 = Column(Integer, ForeignKey('player_games.id', ondelete="CASCADE"), nullable=False)
     #goal_type = Column(Enum())
     time = Column(Float, nullable=False)
-    '''

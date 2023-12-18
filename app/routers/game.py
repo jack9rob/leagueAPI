@@ -30,3 +30,16 @@ def get_all_games(db: Session = Depends(get_db)):
                                    ).join(home_team, home_team.id == home_season.team_id
                                           ).join(away_team, away_team.id == away_season.team_id).all()
     return games
+
+@router.post('/players')
+def create_player_game(player_game: game.PlayerGameCreate, db: Session = Depends(get_db)):
+    db_game = models.PlayerGame(**player_game.model_dump())
+    db.add(db_game)
+    db.commit()
+    db.refresh(db_game)
+    return db_game
+
+@router.get('/{id}/players')
+def get_player_game_by_game(id: int, db: Session = Depends(get_db)):
+    players = db.query(models.PlayerGame).filter(models.PlayerGame.game_id == id).all()
+    return players
