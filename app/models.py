@@ -71,18 +71,15 @@ class Game(Base):
 
     home_team = relationship("TeamSeason", foreign_keys=[team_home_id])
     away_team = relationship("TeamSeason", foreign_keys=[team_away_id])
-'''
-class PositionEnum(enum.Enum):
-    player = "player"
-    goalie = "goalie"
+
 
 class PlayerTeamSeason(Base):
     __tablename__ = "player_team_seasons"
     id = Column(Integer, primary_key=True, index=True)
     player_id = Column(Integer, ForeignKey("players.id", ondelete="CASCADE"), nullable=False)
     team_season_id = Column(Integer, ForeignKey("team_seasons.id", ondelete="CASCADE"), nullable=False)
-    position = Column(Enum(PositionEnum))
-
+    is_player = Column(Boolean, nullable=False, server_default='True')
+'''
 class PlayerGame(Base):
     __tablename__ = "player_games"
     id = Column(Integer, primary_key=True, index=True)

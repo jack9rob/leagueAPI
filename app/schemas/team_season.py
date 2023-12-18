@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import List
 from .team import TeamResponse
 from .season import Season
+from .player import PlayerResponse
 
 class TeamSeason(BaseModel):
     id: int
@@ -31,3 +32,18 @@ class SeasonResponse(BaseModel):
 
 class TeamsSeasons(BaseModel):
     data: SeasonResponse
+
+# team season players
+class PlayerTeamSeason(BaseModel):
+    is_player: int
+class PlayerTeamSeasonCreate(BaseModel):
+    player_id: int
+    team_season_id: int
+    is_player: bool
+
+class TeamRoster(BaseModel):
+    PlayerTeamSeason: PlayerTeamSeason
+    Player: PlayerResponse
+
+class TeamRosterResponse(BaseModel):
+    data: List[TeamRoster]

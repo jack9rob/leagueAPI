@@ -46,3 +46,24 @@ def get_teams_seasons(id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"team with id: {id} was not found")
     
     return team_seasons
+
+@router.post('/players')
+def create_player_team_season(player_team_season: team_season.PlayerTeamSeasonCreate, db: Session = Depends(get_db)):
+    db_player_team_season = models.PlayerTeamSeason(**player_team_season.model_dump())
+    db.add(db_player_team_season)
+    db.commit()
+    db.refresh(db_player_team_season)
+    return db_player_team_season
+
+@router.get('/players')
+def get_season_roster(db: Session = Depends(get_db)):
+    team_roster = db.query(models.PlayerTeamSeason).all()
+    return team_roster
+
+@router.get('/players/{id}', response_model=team_season.TeamRosterResponse)
+def get_players_by_team(id: int, db: Session = Depends(get_db)):
+    players = db.query(models.PlayerTeamSeason, models.Player
+                       ).filter(models.PlayerTeamSeason.team_season_id ==id
+                                ).join(models.Player, models.Player.id == models.PlayerTeamSeason.player_id
+                                       ).order_by(models.PlayerTeamSeason.is_player).all()
+    return {'data': players}
