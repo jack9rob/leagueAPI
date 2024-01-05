@@ -17,3 +17,7 @@ class PlayerGameCreate(BaseModel):
     team_id: int
     is_player: Optional[bool] = True
 
+class CreateGoal(BaseModel):
+    player_game_id: int
+    player_game_assist_1: int
+    player_game_assist_2: int

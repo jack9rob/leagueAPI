@@ -66,4 +66,7 @@ def get_players_by_team(id: int, db: Session = Depends(get_db)):
                        ).filter(models.PlayerTeamSeason.team_season_id ==id
                                 ).join(models.Player, models.Player.id == models.PlayerTeamSeason.player_id
                                        ).order_by(models.PlayerTeamSeason.is_player).all()
+    for x in players:
+        print(x.Player.id)
+    
     return {'data': players}
