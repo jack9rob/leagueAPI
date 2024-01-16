@@ -1,6 +1,7 @@
 import json
 from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from app.database import get_db
 from .. import utils, models
 from ..schemas import team_season, team
@@ -60,13 +61,15 @@ def get_season_roster(db: Session = Depends(get_db)):
     team_roster = db.query(models.PlayerTeamSeason).all()
     return team_roster
 
-@router.get('/players/{id}', response_model=team_season.TeamRosterResponse)
+@router.get('/players/{id}')
 def get_players_by_team(id: int, db: Session = Depends(get_db)):
     players = db.query(models.PlayerTeamSeason, models.Player
                        ).filter(models.PlayerTeamSeason.team_season_id ==id
                                 ).join(models.Player, models.Player.id == models.PlayerTeamSeason.player_id
                                        ).order_by(models.PlayerTeamSeason.is_player).all()
+    '''
     for x in players:
-        print(x.Player.id)
-    
+        goals = db.query(models.Goal, func.count(models.Goal.id)).filter(models.Goal.team_season_id == x.PlayerTeamSeason.id).all()
+        print(goals)
+    '''
     return {'data': players}

@@ -84,19 +84,19 @@ class PlayerTeamSeason(Base):
     is_player = Column(Boolean, nullable=False, server_default='True')
     #status - default is active, also injured, emergency player, removed
 
-class PlayerGame(Base):
+class PlayerGame(Base): # could use player game, it has the game id, player id, and team_season_id
     __tablename__ = "player_games"
     id = Column(Integer, primary_key=True, index=True)
     player_id = Column(Integer, ForeignKey("players.id", ondelete="CASCADE"), nullable=False)
     game_id = Column(Integer, ForeignKey('games.id', ondelete="CASCADE"), nullable=False)
-    team_id = Column(Integer, ForeignKey('teams.id', ondelete='CASCADE'), nullable=False)
+    team_season_id = Column(Integer, ForeignKey('team_seasons.id', ondelete='CASCADE'), nullable=False)
     is_player = Column(Boolean, nullable=False, server_default='True')
     #emergency plauer
 
-class GoalieGame(Base): #maybe change to goalie stats, not too sure
-    __tablename__ = 'goalie_games'
+class GoalieStats(Base): #maybe change to goalie stats, not too sure
+    __tablename__ = 'goalie_stats'
     id = Column(Integer, primary_key=True, index=True)
-    player_id = Column(Integer, ForeignKey("players.id", ondelete="CASCADE"), nullable=False)
+    player_game_id = Column(Integer, ForeignKey('player_games.id', ondelete='CASCADE'), nullable=False)
     game_id = Column(Integer, ForeignKey('games.id', ondelete="CASCADE"), nullable=False)
     team_id = Column(Integer, ForeignKey('teams.id', ondelete='CASCADE'), nullable=False)
     saves = Column(Integer, nullable=False, server_default='0')
@@ -105,17 +105,14 @@ class GoalieGame(Base): #maybe change to goalie stats, not too sure
 class Goal(Base):
     __tablename__ = "goals"
     id = Column(Integer, primary_key=True, index=True)
-    player_id = Column(Integer, ForeignKey('players.id', ondelete='CASCADE'), nullable=False)
-    assist1_player_id = Column(Integer, ForeignKey('players.id', ondelete='CASCADE'), nullable=False)
-    assist2_player_id = Column(Integer, ForeignKey('players.id', ondelete='CASCADE'), nullable=False)
-    game_id = Column(Integer, ForeignKey('games.id', ondelete='CASCASE'), nullable=False)
-    team_season_id = Column(Integer, ForeignKey('team_seasons.id', ondelete='CASCADE'), nullable=False)
+    player_game_id = Column(Integer, ForeignKey('player_games.id', ondelete='CASCADE'), nullable=False)
     #goal type (empty net, shorthanded, powerplay, evenstrength)
 
 class Assist(Base):
     __tablename__ = "assists"
     id = Column(Integer, primary_key=True, index=True)
     player_id = Column(Integer, ForeignKey('players.id', ondelete='CASCADE'), nullable=False)
-    goal_id = Column(Integer, ForeignKey('goals.id', on_delete='CASCADE'), nullable=False)
+    goal_id = Column(Integer, ForeignKey('goals.id', ondelete='CASCADE'), nullable=False)
+    game_id = Column(Integer, ForeignKey('games.id', ondelete='CASCADE'), nullable=False)
     is_primary = Column(Boolean, nullable=False, server_default='True')
 

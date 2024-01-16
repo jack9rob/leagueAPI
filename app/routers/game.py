@@ -39,6 +39,18 @@ def create_player_game(player_game: game.PlayerGameCreate, db: Session = Depends
     db.refresh(db_game)
     return db_game
 
+@router.get('/stats')
+def get_game_stats(db: Session = Depends(get_db)):
+    print('here')
+    query = db.query(models.Goal.player_game_id, models.PlayerGame.team_season_id, models.PlayerGame.player_id, models.Player,func.count(models.Goal.player_game_id).label('goals')
+                    ).filter(models.PlayerGame.team_season_id==1
+                     ).join(models.PlayerGame, models.PlayerGame.id == models.Goal.player_game_id
+                      ).join(models.Player, models.Player.id == models.PlayerGame.player_id
+                            ).group_by(models.Goal.player_game_id, models.PlayerGame.team_season_id, models.PlayerGame.player_id, models.Player)
+    print(query)
+    query = query.all()
+    return {'data': query}
+
 @router.get('/{id}/players')
 def get_player_game_by_game(id: int, db: Session = Depends(get_db)):
     players = db.query(models.PlayerGame).filter(models.PlayerGame.game_id == id).all()
@@ -65,8 +77,3 @@ def get_goals_game(id: int, db: Session = Depends(get_db)):
                      ).join(models.PlayerGame, models.Goal.player_game_id == models.PlayerGame.id
                         ).group_by(models.Goal.player_game_id).all()
     return goals
-
-@router.get('/{id}/stats')
-def get_game_stats(id: int, db: Session = Depends(get_db)):
-    stats = []
-    players = db.query(models.PlayerGame, models.Player)
