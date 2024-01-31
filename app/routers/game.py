@@ -77,3 +77,5 @@ def get_goals_game(id: int, db: Session = Depends(get_db)):
                      ).join(models.PlayerGame, models.Goal.player_game_id == models.PlayerGame.id
                         ).group_by(models.Goal.player_game_id).all()
     return goals
+
+#game overview (team seasons, list of goals, list of player stats, list game details/stats)

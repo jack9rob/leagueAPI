@@ -24,3 +24,5 @@ def get_seasons(id: int, db: Session = Depends(get_db)):
     team_seasons = db.query(models.TeamSeason, models.Team, models.Season).join(models.Season, models.Season.id == models.TeamSeason.season_id).join(models.Team, models.Team.id == models.TeamSeason.team_id).filter(models.Season.id == id).all()
 
     return {"data": {"season": db_season, "teams": team_seasons}}
+
+# season overview (team standings, points leaders, upcoming games, recent games)

@@ -25,6 +25,7 @@ def get_teams(db: Session = Depends(get_db)):
     teams = db.query(models.Team, models.Player).join(models.Player, models.Player.id == models.Team.player_id).all()
     return {"data": teams}
 
+
 @router.post('/seasons')
 def create_team_season(team_season: team_season.TeamSeasonCreate, db: Session = Depends((get_db))):
     db_team_season = models.TeamSeason(**team_season.model_dump())
@@ -32,6 +33,7 @@ def create_team_season(team_season: team_season.TeamSeasonCreate, db: Session = 
     db.commit()
     db.refresh(db_team_season)
     return db_team_season
+
 
 @router.get('/seasons', response_model=team_season.TeamSeasonList)
 def get_team_seasons(db: Session = Depends(get_db)):
@@ -73,3 +75,9 @@ def get_players_by_team(id: int, db: Session = Depends(get_db)):
         print(goals)
     '''
     return {'data': players}
+
+#routes
+
+#team overview (name, all team seasons)
+
+#team season (team season info, player roster, games scores)
