@@ -22,8 +22,13 @@ def create_player(player: player.PlayerCreate, db: Session = Depends(get_db)):
     return db_player
 
 # get players stats for each season
-@router.get('/stats')
-def get_season_stats(db: Session=Depends(get_db)):
+@router.get('/{id}/stats')
+def get_season_stats(id: int, db: Session=Depends(get_db)):
+        #check if player exists
+        player = db.query(models.Player).filter(models.Player.id == id).first()
+        if not player:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"player with id {id} was not found")
+        
         goal_query = db.query(models.PlayerGame.player_id, models.PlayerGame.team_season_id, func.count(models.PlayerGame.player_id).label('goals')
                             ).select_from(models.Goal
                             ).join(models.PlayerGame, models.PlayerGame.player_id == models.Goal.player_game_id
@@ -41,11 +46,14 @@ def get_season_stats(db: Session=Depends(get_db)):
                          models.TeamSeason.season_id, func.coalesce(goal_query.c.goals, text('0')).label('goals'), func.coalesce(assist_query.c.assists, text('0')).label('assists'), 
                          func.coalesce(goal_query.c.goals + assist_query.c.assists, goal_query.c.goals, assist_query.c.assists, text('0')).label('points')
                         ).select_from(models.PlayerTeamSeason
-                        ).filter(models.Player.id == 1
+                        ).filter(models.Player.id == id
                         ).join(models.TeamSeason, models.TeamSeason.id == models.PlayerTeamSeason.team_season_id
                         ).join(goal_query, (goal_query.c.player_id == models.PlayerTeamSeason.player_id) & (goal_query.c.team_season_id == models.PlayerTeamSeason.team_season_id),isouter=True
                         ).join(assist_query, (assist_query.c.player_id == models.PlayerTeamSeason.player_id) & (assist_query.c.team_season_id == models.PlayerTeamSeason.team_season_id), isouter=True
                         ).join(models.Player, models.Player.id == models.PlayerTeamSeason.player_id
                         ).all()
+        if query == []:
+            # use for now, should be changed to another status most likely
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"player with id {id} exists, but has no seasons")
         return {'data': query}
 
